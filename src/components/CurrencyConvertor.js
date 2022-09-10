@@ -37,7 +37,7 @@ export default function CurrencyConvertor() {
 
     //get result
     const getResult = () => {
-        console.log(`https://v6.exchangerate-api.com/v6/6f8a08216183e273ab7f380e/pair/${fromCurrency}/${toCurrency}/${amount}`)
+        //console.log(`https://v6.exchangerate-api.com/v6/6f8a08216183e273ab7f380e/pair/${fromCurrency}/${toCurrency}/${amount}`)
         axios.get(`https://v6.exchangerate-api.com/v6/6f8a08216183e273ab7f380e/pair/${fromCurrency}/${toCurrency}/${amount}`)
             .then((response) => response.data)
             .then(data => setResult(data.conversion_result))
@@ -62,22 +62,28 @@ export default function CurrencyConvertor() {
     }
 
     return (
-        <div className="border-2 border-gray-600 rounded p-4 w-30 h-50 ">
+        <div className="w-full h-screen bg-gradient-to-b from-pink-500 to-yellow-500 font-mono">
+            <div className="p-6">
+                <h1 className="text-3xl m-10 underline font-bold text-white text-center">Currency Convertor</h1>
+                <div className="flex items-center w-3/4 border-b border-teal-500 py-2 m-20">
+                    <input
+                        className="appearance-none bg-transparent border-none w-full text-white mr-3 py-1 px-2 leading-tight focus:outline-none" required
+                        onChange={(e) => { setAmount(e.target.value); }} onBlur={getResult} />
 
-            <h1 className="text-3xl font-bold underline">Currency Convertor</h1>
-            <div>
-                Amount : <input type="number"
-                    className="border-2 border-solid m-4 text-black" required
-                    placeholder="Enter the amount" onChange={(e) => { setAmount(e.target.value); }} onBlur={getResult} />
-                From : <Dropdown name="FromCList" options={options} selectedValue={fromCurrency} currencyList={handleCurrencyList} />
-                <CompareArrowsIcon onClick={flip} className="m-4 ml-70" />
-                To : <Dropdown name="ToCList" options={options} selectedValue={toCurrency} currencyList={handleCurrencyList} />
+                    <Dropdown name="FromCList" options={options} selectedValue={fromCurrency} currencyList={handleCurrencyList} />
+                </div>
+                <div className="flex items-center w-3/4 border-b border-teal-500 py-2 m-20">
+                    <input
+                        className="appearance-none bg-transparent border-none w-full text-white mr-3 py-1 px-2 leading-tight focus:outline-none" required
+                        onChange={(e) => { setAmount(e.target.value); }} onBlur={getResult} />
+
+                    <Dropdown name="ToCList" options={options} selectedValue={toCurrency} currencyList={handleCurrencyList} />
+                </div>
+                {/* 
+                <div>
+                    <CompareArrowsIcon onClick={flip} className="m-4 ml-70 text-white" />
+                </div> */}
             </div>
-            <div>
-                {
-                    ((toCurrency != fromCurrency) && result) ? <h3 className="font-bold text-3xl "><span className="text-sky-400">{amount} {fromCurrency}</span> to <span className="text-sky-400">{result} {toCurrency}</span></h3> : ""
-                }
-            </div>
-        </div>
+        </div >
     )
 }
