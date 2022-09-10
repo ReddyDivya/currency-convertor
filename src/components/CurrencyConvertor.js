@@ -26,11 +26,6 @@ export default function CurrencyConvertor() {
     const Convert = () => {
 
         //validating
-        if (amount == "") {
-            alert("Please enter amount to convert.");
-            return false;
-        }
-
         if (toCurrency == fromCurrency) {
             alert("Change your converted currency");
             return false;
@@ -42,12 +37,13 @@ export default function CurrencyConvertor() {
 
     //get result
     const getResult = () => {
-
-        axios.get(`https://v6.exchangerate-api.com/v6/6f8a08216183e273ab7f380e/pair/${toCurrency}/${fromCurrency}/${amount}`)
+        console.log(`https://v6.exchangerate-api.com/v6/6f8a08216183e273ab7f380e/pair/${fromCurrency}/${toCurrency}/${amount}`)
+        axios.get(`https://v6.exchangerate-api.com/v6/6f8a08216183e273ab7f380e/pair/${fromCurrency}/${toCurrency}/${amount}`)
             .then((response) => response.data)
             .then(data => setResult(data.conversion_result))
     }
 
+    //console.log('result ' + result)
     const flip = () => {
         var temp = fromCurrency;
         setToCurrency(temp);
@@ -72,13 +68,10 @@ export default function CurrencyConvertor() {
             <div>
                 Amount : <input type="number"
                     className="border-2 border-solid m-4 text-black" required
-                    placeholder="Enter the amount" onChange={(e) => setAmount(e.target.value)} />
+                    placeholder="Enter the amount" onChange={(e) => { setAmount(e.target.value); }} onBlur={getResult} />
                 From : <Dropdown name="FromCList" options={options} selectedValue={fromCurrency} currencyList={handleCurrencyList} />
                 <CompareArrowsIcon onClick={flip} className="m-4 ml-70" />
                 To : <Dropdown name="ToCList" options={options} selectedValue={toCurrency} currencyList={handleCurrencyList} />
-            </div>
-            <div className="container">
-                <button onClick={Convert} className="m-4 w-80 ml-70 rounded border-gray-300 bg-sky-900 p-4 font-bold text-white">Convert</button>
             </div>
             <div>
                 {
