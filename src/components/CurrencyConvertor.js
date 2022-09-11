@@ -5,11 +5,11 @@ import Dropdown from './DropDown';
 
 export default function CurrencyConvertor() {
 
-    const [amount, setAmount] = useState(0);//amount
-    const [fromCurrency, setFromCurrency] = useState("USD");//fromCurrency
-    const [toCurrency, setToCurrency] = useState("INR");//toCurrency
+    const [fromCurrency, setFromCurrency] = useState();//FromCurrency
+    const [toCurrency, setToCurrency] = useState();//ToCurrency
+    const [fromSelectedCurrency, setFromSelectedCurrency] = useState("USD");//fromSelectedCurrency
+    const [toSelectedCurrency, setToSelectedCurrency] = useState("INR");//toSeletedCurrency
     const [options, setOptions] = useState([]);//options for dropdown
-    const [result, setResult] = useState(0);//Result
 
     //getting Currencies list and filling in the From & To currencies dropdowns
     useEffect(() => {
@@ -18,46 +18,47 @@ export default function CurrencyConvertor() {
             .then(data => setOptions(Object.keys(data.symbols)))
     }, []);
 
-    //getting results while changing from and to curriencies
+    //getting results while changing from currency input field
     useEffect(() => {
-        Convert();
+        if (!toCurrency && fromCurrency !== "")
+            Convert(fromSelectedCurrency, toSelectedCurrency, fromCurrency, setToCurrency);
+
+        return;
     }, [fromCurrency, toCurrency]);
 
-    const Convert = () => {
+    //getting results while changing to currency input field
+    useEffect(() => {
+        if (!fromCurrency && toCurrency !== "")
+            Convert(toSelectedCurrency, fromSelectedCurrency, toCurrency, setFromCurrency);
+        return;
+    }, [fromCurrency, toCurrency]);
 
-        //validating
-        if (toCurrency == fromCurrency) {
-            alert("Change your converted currency");
-            return false;
-        }
-        else {
-            getResult();
-        }
-    }
+    //getting results while changing fromSelectedCurrency field
+    useEffect(() => {
+        Convert(fromSelectedCurrency, toSelectedCurrency, fromCurrency, setToCurrency);
+        return;
+    }, [fromSelectedCurrency]);
 
-    //get result
-    const getResult = () => {
-        //console.log(`https://v6.exchangerate-api.com/v6/6f8a08216183e273ab7f380e/pair/${fromCurrency}/${toCurrency}/${amount}`)
-        axios.get(`https://v6.exchangerate-api.com/v6/6f8a08216183e273ab7f380e/pair/${fromCurrency}/${toCurrency}/${amount}`)
-            .then((response) => response.data)
-            .then(data => setResult(data.conversion_result))
-    }
+    //getting results while changing toSelectedCurrency field
+    useEffect(() => {
+        Convert(fromSelectedCurrency, toSelectedCurrency, fromCurrency, setToCurrency);
+        return;
+    }, [toSelectedCurrency]);
 
-    //console.log('result ' + result)
-    const flip = () => {
-        var temp = fromCurrency;
-        setToCurrency(temp);
-        setFromCurrency(toCurrency);
+    const Convert = (vFromCurrency, vToCurrency, vAmount, setResultField) => {
+        axios.get(`https://api.exchangerate.host/convert?from=${vFromCurrency}&to=${vToCurrency}&amount=${vAmount}`)
+            .then((response) => response)
+            .then((data) => { console.log(data.data.result); setResultField(data.data.result != null ? data.data.result.toFixed(2) : '') })
     }
 
     //currency list in To and From
     const handleCurrencyList = (e) => {
 
         if (e.target.name == "ToCList") {
-            setToCurrency(e.target.value);
+            setToSelectedCurrency(e.target.value);
         }
         else if (e.target.name == "FromCList") {
-            setFromCurrency(e.target.value);
+            setFromSelectedCurrency(e.target.value);
         }
     }
 
@@ -68,21 +69,17 @@ export default function CurrencyConvertor() {
                 <div className="flex items-center w-3/4 border-b border-teal-500 py-2 m-20">
                     <input
                         className="appearance-none bg-transparent border-none w-full text-white mr-3 py-1 px-2 leading-tight focus:outline-none" required
-                        onChange={(e) => { setAmount(e.target.value); }} onBlur={getResult} />
+                        value={fromCurrency} onChange={(e) => { setFromCurrency(e.target.value); setToCurrency(""); }} />
 
-                    <Dropdown name="FromCList" options={options} selectedValue={fromCurrency} currencyList={handleCurrencyList} />
+                    <Dropdown name="FromCList" options={options} selectedValue={fromSelectedCurrency} currencyList={handleCurrencyList} />
                 </div>
                 <div className="flex items-center w-3/4 border-b border-teal-500 py-2 m-20">
                     <input
                         className="appearance-none bg-transparent border-none w-full text-white mr-3 py-1 px-2 leading-tight focus:outline-none" required
-                        onChange={(e) => { setAmount(e.target.value); }} onBlur={getResult} />
+                        value={toCurrency} onChange={(e) => { setToCurrency(e.target.value); setFromCurrency(""); }} />
 
-                    <Dropdown name="ToCList" options={options} selectedValue={toCurrency} currencyList={handleCurrencyList} />
+                    <Dropdown name="ToCList" options={options} selectedValue={toSelectedCurrency} currencyList={handleCurrencyList} />
                 </div>
-                {/* 
-                <div>
-                    <CompareArrowsIcon onClick={flip} className="m-4 ml-70 text-white" />
-                </div> */}
             </div>
         </div >
     )
